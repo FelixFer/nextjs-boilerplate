@@ -1,5 +1,6 @@
 import axios, { type AxiosError } from 'axios';
 
+import { env } from '@/lib/env';
 import { ApiError } from '@/lib/errors/api-error';
 
 import type { ApiErrorResponse } from './types';
@@ -9,7 +10,7 @@ import type { ApiErrorResponse } from './types';
  * every request gets the same base URL, timeout, and error handling.
  */
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: env.NEXT_PUBLIC_API_URL,
   timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',

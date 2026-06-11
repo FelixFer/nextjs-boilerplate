@@ -40,6 +40,8 @@ For a quick demo, point it at JSONPlaceholder:
 NEXT_PUBLIC_API_URL=https://jsonplaceholder.typicode.com
 ```
 
+These variables are validated against a Zod schema in `src/lib/env.ts` when the app starts. If one is missing or invalid, the build (and `next dev`) fail immediately with a message telling you which variable is wrong — no cryptic runtime errors. Read validated values from `env` (e.g. `import { env } from '@/lib/env'`) rather than `process.env` directly.
+
 ### Scripts
 
 | Script                 | Description                      |
@@ -319,10 +321,24 @@ Working examples: `src/features/posts/components/create-post-form.tsx` (text inp
 NEXT_PUBLIC_ANALYTICS_ID=abc123
 ```
 
-2. Read it with `process.env.NEXT_PUBLIC_ANALYTICS_ID`.
-3. Restart the dev server — env vars are read once at startup.
+2. Add it to the schema in `src/lib/env.ts` so it is validated and type-safe:
 
-The `NEXT_PUBLIC_` prefix means the value is embedded in the browser bundle, visible to anyone. Use it for public config (URLs, IDs). Secrets (API keys, passwords) must NOT have the prefix and can only be read in server code.
+```ts
+const envSchema = z.object({
+  // ...existing vars
+  NEXT_PUBLIC_ANALYTICS_ID: z.string(),
+});
+
+const parsed = envSchema.safeParse({
+  // ...existing vars
+  NEXT_PUBLIC_ANALYTICS_ID: process.env.NEXT_PUBLIC_ANALYTICS_ID,
+});
+```
+
+3. Read it anywhere with `import { env } from '@/lib/env'` → `env.NEXT_PUBLIC_ANALYTICS_ID`.
+4. Restart the dev server — env vars are read once at startup.
+
+The `NEXT_PUBLIC_` prefix means the value is embedded in the browser bundle, visible to anyone. Use it for public config (URLs, IDs). Secrets (API keys, passwords) must NOT have the prefix and can only be read in server code. (Each variable must be listed literally in both the schema object and the `safeParse` call — Next.js only inlines `NEXT_PUBLIC_*` values that are accessed as static property references.)
 
 ### …change the colors or theme?
 

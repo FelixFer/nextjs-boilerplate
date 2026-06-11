@@ -1,5 +1,9 @@
 import type { NextConfig } from 'next';
 
+// Validate environment variables at startup so a misconfigured clone fails
+// immediately with a clear message instead of crashing at runtime.
+import './src/lib/env';
+
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
